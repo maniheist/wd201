@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 function todoList() {
     all = [];
     const add = (todoItem) => {
