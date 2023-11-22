@@ -1,9 +1,9 @@
 const http = require("http");
 const fs = require("fs");
-const minimist = require("minimist");
+const args = require("minimist")(process.argv.slice(2));
 
-const args = minimist(process.argv.slice(2));
-const port = args.port || 3000; 
+
+
 let manihomeContent = "";
 let maniprojectContent = "";
 let maniregistrationContent = "";
@@ -29,15 +29,15 @@ fs.readFile("registration.html", (err, registration) => {
   maniregistrationContent = registration;
 });
 
-const server = http.createServer((request, response) => {
+http.server = http.createServer((request, response) => {
   let url = request.url;
   response.writeHeader(200, { "Content-Type": "text/html" });
   switch (url) {
-    case "/project.html":
+    case "/project":
       response.write(maniprojectContent);
       response.end();
       break;
-    case "/registration.html":
+    case "/registration":
       response.write(maniregistrationContent);
       response.end();
       break;
@@ -46,8 +46,6 @@ const server = http.createServer((request, response) => {
       response.end();
       break;
   }
-});
+})
 
-server.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+.listen(args["port"])
