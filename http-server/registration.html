@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.js"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <title>Mani Form</title>
+
+    <style>
+      input:focus {
+        outline: none;
+      }
+      input#name:invalid:focus {
+        border: 1px solid red;
+      }
+      input#email:invalid:focus {
+        border: 1px solid red;
+      }
+      input#password:invalid:focus {
+        border: 1px solid red;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 p-6">
+    <div class="max-w-md mx-auto bg-yellow-200 p-8 border rounded-md shadow-md">
+      <h2 class="text-2xl font-semibold mb-6">Registration Form</h2>
+
+      <form
+        id="mani-form"
+        onsubmit="return validateForm()"
+        onsubmit="return validate(email)"
+      >
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-600"
+            >Name</label
+          >
+          <input
+            required
+            type="text"
+            id="name"
+            name="name"
+            class="mt-1 p-2 w-full border rounded-md"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-600"
+            >Email</label
+          >
+          <input
+            required
+            placeholder="1234567@gmail.com"
+            type="email"
+            id="email"
+            name="email"
+            class="mt-1 p-2 w-full border rounded-md"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-gray-600"
+            >Password</label
+          >
+          <input
+            required
+            type="password"
+            id="password"
+            name="password"
+            class="mt-1 p-2 w-full border rounded-md"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="dob" class="block text-sm font-medium text-gray-600"
+            >Date of Birth</label
+          >
+          <input
+            type="date"
+            id="dob"
+            name="dob"
+            class="mt-1 p-2 w-full border rounded-md"
+            placeholder="You be in a age group of 18-55 "
+            required
+          />
+          <p id="dobError" class="text-red-500 hidden">
+            Please enter a valid date of birth between ages 18 and 55.
+          </p>
+        </div>
+
+        <div class="mb-4 flex items-center">
+          <input type="checkbox" id="terms" name="terms" class="mr-2" />
+          <label for="terms" class="text-sm text-gray-600"
+            >I accept the terms and conditions</label
+          >
+        </div>
+
+        <button
+          type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <div
+      class="relative bg-white px-6 mt-5 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:rounded-lg sm:px-10"
+    >
+      <div class="mx-auto">
+        <h2 class="text-3xl text-center font-bold leading-tight">Entries</h2>
+        <div class="divide-y divide-gray-300/50" id="user-entries"></div>
+      </div>
+    </div>
+
+    <script>
+      let userForm = document.getElementById("mani-form");
+
+      const retrieveEntries = () => {
+        let entries = localStorage.getItem("user-entries");
+
+        if (entries) {
+          entries = JSON.parse(entries);
+        } else {
+          entries = [];
+        }
+        return entries;
+      };
+      let userEntries = retrieveEntries();
+
+      const displayEntries = () => {
+        const entries = retrieveEntries();
+
+        const tableEntries = entries
+          .map((entry) => {
+            const nameCell = `<td class='border px-4 py-2'>${entry.name}</td>`;
+            const emailCell = `<td class='border px-4 py-2'>${entry.email}</td>`;
+            const passwordCell = `<td class='border px-4 py-2'>${entry.password}</td>`;
+            const dobCell = `<td class='border px-4 py-2'>${entry.dob}</td>`;
+            const acceptTermsCell = `<td class='border px-4 py-2'>${entry.acceptedTermsAndConditions}</td>`;
+
+            const row = `<tr>${nameCell} ${emailCell} ${passwordCell} ${dobCell} ${acceptTermsCell}</tr>`;
+            return row;
+          })
+          .join("\n");
+
+        const table = `<table class="table-auto w-full"><tr>
+    <th class="px-4 py-2">Name</th>
+    <th class="px-4 py-2">Email</th>
+    <th class="px-4 py-2">Password</th>
+    <th class="px-4 py-2">Dob</th>
+    <th class="px-4 py-2">Accepted terms?</th>
+    </tr>${tableEntries} </table>`;
+
+        let details = document.getElementById("user-entries");
+        details.innerHTML = table;
+      };
+      const saveUserForm = (event) => {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const dob = document.getElementById("dob").value;
+
+        const acceptedTermsAndConditions =
+          document.getElementById("terms").checked;
+
+        var dobInput = document.getElementById("dob");
+        var dob1 = new Date(dobInput.value);
+        var minDate = new Date(dobInput.min);
+        var maxDate = new Date(dobInput.max);
+        var age = calculateAge(dob1);
+
+        if (age < 18 || age > 55) {
+          return; // Do not store in local storage
+        }
+        const entry = {
+          name,
+          email,
+          password,
+          dob,
+          acceptedTermsAndConditions,
+        };
+
+        // Push the new entry into userEntries array
+        userEntries.push(entry);
+
+        // Save the updated userEntries array to local storage
+        localStorage.setItem("user-entries", JSON.stringify(userEntries));
+
+        // Display the updated entries immediately
+        displayEntries();
+      };
+
+      // Attach the event listener
+      userForm.addEventListener("submit", saveUserForm);
+
+      // Display entries when the page loads
+      displayEntries();
+    </script>
+
+    <script>
+      function validateForm() {
+        var dobInput = document.getElementById("dob");
+        var dobError = document.getElementById("dobError");
+        var dob = new Date(dobInput.value);
+        var minDate = new Date(dobInput.min);
+        var maxDate = new Date(dobInput.max);
+
+        if (dob < minDate || dob > maxDate) {
+          dobError.classList.remove("hidden");
+          return false;
+        } else {
+          dobError.classList.add("hidden");
+        }
+
+        var age = calculateAge(dob);
+        if (age < 18 || age > 55) {
+          return false;
+        }
+
+        saveUserData();
+
+        return true;
+      }
+
+      function calculateAge(dob) {
+        var today = new Date();
+        var birthDate = new Date(dob);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+
+        return age;
+      }
+    </script>
+
+    <script>
+      const email = document.getElementById("email");
+      email.addEventListener("input", () => validate(email));
+
+      function validate(element) {
+        if (element.validity.typeMismatch) {
+          element.setCustomValidity("The wrong format");
+          element.reportValidity();
+        } else {
+          element.setCustomValidity("");
+        }
+      }
+    </script>
+  </body>
+</html>
