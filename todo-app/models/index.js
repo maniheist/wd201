@@ -8,6 +8,16 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 
 const config=require(path.join(__dirname, '../config/config.json'));
+require('dotenv').config(); // <- require this here
+
+// ...Any aditional configuration for sequelize-cli like custom folders for models and migrations
+const path = require('path');
+module.exports = {
+  'config': path.resolve('src', 'config', 'config.js'),
+  'models-path': path.resolve('src', 'models'),
+  'seeders-path': path.resolve('src', 'seeders'),
+  'migrations-path': path.resolve('src', 'migrations')
+};
 const db = {};
 
 let sequelize;
