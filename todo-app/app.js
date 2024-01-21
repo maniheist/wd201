@@ -3,66 +3,88 @@ const app = express();
 const { Todo } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
-const { response } = require("express");
-
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
-app.use(express.static(path.join(__dirname + "/public")));
-// app.use(express.static("public"));
 
-app.get("/", async (req, res) => {
+app.get("/", async (request, response) => {
   const allTodos = await Todo.getTodos();
-  if (req.accepts("html")) {
-    res.render("index", {
+  const overdueTodos = await allTodos.filter(
+    (todo) => todo.dueDate < new Date().toISOString()
+  );
+  const dueTodayTodos = await allTodos.filter(
+    (todo) => todo.dueDate === new Date().toISOString()
+  );
+  const dueLaterTodos = await allTodos.filter(
+    (todo) => todo.dueDate > new Date().toISOString()
+  );
+  if (request.accepts("html")) {
+    response.render("index", {
       allTodos,
+      overdueTodos,
+      dueTodayTodos,
+      dueLaterTodos,
     });
   } else {
-    res.json(allTodos);
+    response.json(allTodos);
   }
 });
 
-app.get("/todos", async (req, res) => {
-  try {
-    const todos = await Todo.findAll({ order: [["id", "ASC"]] });
-    return res.json(todos);
-  } catch (error) {
-    console.log(error);
-    return res.status(422).json(error);
-  }
-});
+app.use(express.static(path.join(__dirname, "public")));
 
-app.post("/todos", async (req, res) => {
-  console.log("Body : ", req.body);
+app.get("/todos", async function (request, response) {
+  console.log("Processing list of all Todos ...");
   try {
-    const todo = await Todo.addTodo({
-      title: req.body.title,
-      dueDate: req.body.dueDate,
-      completed: false,
+    const todos = await Todo.findAll({
+      order: [["id", "ASC"]],
     });
-    return res.json(todo);
+    return response.json(todos);
   } catch (error) {
     console.log(error);
-    return response.status(422).json(error);
+    return response.status(500).send(error);
   }
 });
 
-app.put("/todos/:id/markAsCompleted", async (req, res) => {
-  console.log("Todo marks completed : ", req.params.id);
-  const todo = await Todo.findByPk(req.params.id);
+app.get("/todos/:id", async function (request, response) {
   try {
-    const updateTodo = await todo.markAsCompleted();
-    return res.json(updateTodo);
+    const todo = await Todo.findByPk(request.params.id);
+    return response.json(todo);
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
   }
 });
 
-// eslint-disable-next-line no-unused-vars
-app.delete("/todos/:id", async (req, res) => {
-  console.log("We have to delete a Todo with ID: ", req.params.id);
-  const affectedRow = await Todo.destroy({ where: { id: req.params.id } });
-  res.send(affectedRow ? true : false);
+app.post("/todos", async function (request, response) {
+  try {
+    const todo = await Todo.addTodo(request.body);
+    return response.json(todo);
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+
+app.put("/todos/:id/markAsCompleted", async function (request, response) {
+  const todo = await Todo.findByPk(request.params.id);
+  try {
+    const updatedTodo = await todo.markAsCompleted();
+    return response.json(updatedTodo);
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+
+app.delete("/todos/:id", async function (request, response) {
+  console.log("We have to delete a Todo with ID: ", request.params.id);
+  try {
+    const todo = await Todo.findByPk(request.params.id);
+    await todo.destroy();
+    return response.send(true);
+  } catch (error) {
+    console.log(error);
+    return response.send(false);
+  }
 });
 
 module.exports = app;
