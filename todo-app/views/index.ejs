@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mani Todo Manager</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <script src="js/script.js"></script>
-  </head>
-  <body>
-    <!-- <h1>Todo Manager</h1> -->
-    <!-- for reuse the created common ejs file like header and footer  -->
-    <%- include("header.ejs") %>
-    <br />
-    <%- include("todos.ejs") %> <%- include("footer.ejs") %>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <title>Your Todo App</title>
+
+    <!-- Add Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col items-center justify-center">
+        <p class="py-2"> Welcome to Todo Manager</p>
+        
+    </div>
+</body>
 </html>
