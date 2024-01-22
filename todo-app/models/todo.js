@@ -1,28 +1,23 @@
 "use strict";
 const { Model, Op } = require("sequelize");
-
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
+    
     static associate(models) {
-     
+      // define association here
     }
-
     static addTodo({ title, dueDate }) {
-      return this.create({ title, dueDate, completed: false });
+      return this.create({ title: title, dueDate: dueDate, completed: false });
     }
-
     markAsCompleted() {
       return this.update({ completed: true });
     }
-
-    deleteTodo() {
-      return this.removeTask(id);
+    deletetodo() {
+      return this.removetask(id);
     }
-
     static getTodos() {
       return this.findAll({ order: [["id", "ASC"]] });
     }
-
     static overdue() {
       return this.findAll({
         where: {
@@ -34,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
-
     static dueToday() {
       return this.findAll({
         where: {
@@ -46,7 +40,6 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
-
     static dueLater() {
       return this.findAll({
         where: {
@@ -58,7 +51,6 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
-
     static completedItems() {
       return this.findAll({
         where: {
@@ -67,7 +59,6 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
-
     static async remove(id) {
       return this.destroy({
         where: {
@@ -75,7 +66,6 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
-
     setCompletionStatus(bool) {
       return this.update({ completed: bool });
     }
@@ -92,6 +82,5 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Todo",
     }
   );
-
   return Todo;
 };
