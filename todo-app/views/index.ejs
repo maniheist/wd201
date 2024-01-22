@@ -58,13 +58,25 @@
                 console.error(err);
             });
         }
+
+        // New function to validate the form before submission
+        const validateForm = () => {
+            const dueDateInput = document.querySelector('input[name="dueDate"]');
+            
+            if (!dueDateInput.value.trim()) {
+                alert('Due date cannot be empty!');
+                return false; // Prevent form submission
+            }
+            
+            return true; // Allow form submission
+        };
     </script>
 </head>
 <body>
     <div class="grid  grid-cols-6">
         <div class="col-start-3 col-span-2">
             <% include("header.ejs") %> 
-            <form action="/todos" method="post">
+            <form action="/todos" method="post" onsubmit="return validateForm();">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="flex gap-2 py-4">
                     <div class="flex-auto">
