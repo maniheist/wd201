@@ -3,7 +3,7 @@ const { Model, Op } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
-   
+    
     static associate(models) {
     }
     static addTodo({ title, dueDate }) {
