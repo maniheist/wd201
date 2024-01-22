@@ -6,33 +6,33 @@
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <meta name="csrf-token" content="<%= csrfToken %>">
         <link href="./css/style.css" rel="stylesheet">
-        <title>Mani Sankar Reddy Todo Manager</title>
+        <title>MANI SANKAR REDDY Todo Manager</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="./css/style.css" rel="stylesheet">
         <script>
-          let token = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-          function updateTodo = (id) => {
-          const status = document.getElementById(`todo-checkbox-${id}`).checked
+          const token = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+          const updateTodo = (id) => {
+          const bool = document.querySelector(`#checkbox-${id}`).checked
           console.log(bool);
           fetch(`/todos/${id}`, {
-            method: "put",
+            method: "PUT",
             headers: {
             "Content-Type": "application/json",
             },
             body : JSON.stringify({
-            completed : status,
             _csrf : token,
-            }),
+            completed : bool
+            })
           })
           .then((res) => {
             if (res.ok) {
               window.location.reload();
             }
           })
-          .catch(err) => {
+          .catch(err);{
           console.log(err);
-          });
           }
+        };
             function deleteTodo(id) {
         fetch(`/todos/${id}`,{
           method: "delete",
@@ -46,11 +46,9 @@
             window.location.reload();
           }
          })
-         .catch((err) => { console.log(err);
-         });
+         .catch((err) => console.erroe(err));
       }
         </script>
-         <title>Home Page</title>
     </head>
     <body>
        <div class= "grid  grid-cols-6">
