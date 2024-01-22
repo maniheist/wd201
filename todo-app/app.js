@@ -6,6 +6,7 @@ var cookieParser = require("cookie-parser");
 app.use(bodyParser.json());
 const path = require("path");
 const { Todo } = require("./models");
+// eslint-disable-next-line no-unused-vars
 const todo = require("./models/todo");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
@@ -35,6 +36,7 @@ app.get("/", async (request, response) => {
 });
 
 app.get("/todos", async (request, response) => {
+  // defining route to displaying message
   console.log("Todo list");
   try {
     const todoslist = await Todo.findAll();
@@ -57,6 +59,7 @@ app.get("/todos/:id", async function (request, response) {
 app.post("/todos", async (request, response) => {
   console.log("creating new todo", request.body);
   try {
+    // eslint-disable-next-line no-unused-vars
     await Todo.addTodo({
       title: request.body.title,
       dueDate: request.body.dueDate,
@@ -68,6 +71,7 @@ app.post("/todos", async (request, response) => {
     return response.status(422).json(error);
   }
 });
+//PUT https://mytodoapp.com/todos/123/markAscomplete
 app.put("/todos/:id", async (request, response) => {
   console.log("Mark Todo as completed:", request.params.id);
   const todo = await Todo.findByPk(request.params.id);
