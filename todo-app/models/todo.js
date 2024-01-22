@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     deleteTodo() {
-      return this.removeTask(id); // Assuming removeTask is defined elsewhere
+      return this.removeTask(id);
     }
 
     static getTodos() {
