@@ -1,266 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="csrf-token" content="<%= csrfToken %>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>TO-DO Manager</title>
-    <link rel="stylesheet" href="./css/style.css" />
-    <script>
-      var token = document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content");
-
-      function updateTodo(id, currentStatus) {
-        fetch(`/todos/${id}`, {
-          method: "put",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            completed: !currentStatus,
-            "_csrf": token,
-          }),
-        })
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <meta name="csrf-token" content="<%= csrfToken %>">
+        <link href="./css/style.css" rel="stylesheet">
+        <title>Todo Manager</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="./css/style.css" rel="stylesheet">
+        <script>
+          const token = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+          const updateTodo = (id) => {
+          const bool = document.querySelector(`#checkbox-${id}`).checked
+          console.log(bool);
+          fetch(`/todos/${id}`, {
+            method: "PUT",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body : JSON.stringify({
+            _csrf : token,
+            completed : bool
+            })
+          })
           .then((res) => {
             if (res.ok) {
               window.location.reload();
             }
           })
-          .catch((err) => console.log(err));
-      }
-
-      function deleteTodo(id) {
-        fetch(`/todos/${id}`, {
-          method: "DELETE",
-          headers: {"Content-Type": "application/json"},
+          .catch(err);{
+          console.log(err);
+          }
+        };
+            function deleteTodo(id) {
+        fetch(`/todos/${id}`,{
+          method: "delete",
+          headers: {"Content-Type":"application/json"},
           body: JSON.stringify({
-            "_csrf": token,
+            "_csrf":token
           })
         })
-          .then((res) => {
-            if (res.ok) {
-              window.location.reload();
-            }
-          })
-          .catch((err) => console.log(err));
+         .then((res) => {
+          if (res.ok) {
+            window.location.reload();
+          }
+         })
+         .catch((err) => console.erroe(err));
       }
-    </script>
-  </head>
-  <body class="p-4">
-    <div class="grid grid-cols-6">
-      <div class="col-start-3 col-span-2"><%- include('header.ejs') %></div>
+        </script>
+    </head>
+    <body>
+       <div class= "grid  grid-cols-6">
+        <div class="col-start-3 col-span-2">
+        <%- include("header.ejs") %> 
+        <form action="/todos" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="flex gap-2 py-4">
+                <div class="flex-auto">
+                    <input type="text" name="title" placeholder="what's next" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" required />
+                </div>
+            <div class="flex-auto">
+                <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4 " />
+            </div>
+            <div class="flex-none">
+                <button type="submit" class="bg-green-600 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2">Add</button>
+            </div>  
+            </div>
+        </form>
+        <%- include('todos.ejs', {title: "Overdue", data: overdue}) %>
+        <%- include('todos.ejs', {title: "Due Today", data: dueToday}) %>
+        <%- include('todos.ejs', {title: "Due Later", data: dueLater}) %>
+        <%- include('todos.ejs', {title: "Completed Items", data: completedItems}) %>
     </div>
-
-    <form class="flex justify-center" action="/todos" method="post">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <div class="flex gap-2 py-4 w-2/3">
-        <div class="flex-auto w-64">
-          <input
-            type="text"
-            name="title"
-            class="border border-gray-300 text-gray-900 text-sm rounded w-full p-2"
-            placeholder="What's next?"
-            autofocus
-            required
-          />
-        </div>
-        <div class="flex-auto w-32">
-          <input
-            name="dueDate"
-            type="date"
-            class="border border-gray-300 text-gray-900 text-sm rounded w-full p-2 leading-4"
-          />
-        </div>
-        <div class="flex-none">
-          <button
-            type="submit"
-            class="text-white bg-green-600 hover:bg-green-700 font-medium rounded text-sm px-5 py-2 mr-2 mb-2"
-          >
-            Add
-          </button>
-        </div>
-      </div>
-    </form>
-
-    <div class="mt-2 flex flex-col justify-center items-center">
-    <div class="mt-2 flex flex-col justify-start w-2/5">
-      <div class="flex gap-2 items-center w-2/5 justify-start">
-        <h5>Overdue</h5>
-        <p class="bg-gray-300 flex items-center p-2 px-4 rounded-full"><%= overdue.length %></p>
-      </div>
-      <ul class="list-none pl-4 flex flex-col justify-start pl-12 w-2/5">
-        <% for(var i=0; i<overdue.length; i++) {%>
-        <li class="Todo-Item flex gap-2 items-center">
-          <div
-            class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
-          >
-            <input
-              id="todo-checkbox-<%= overdue[i].id %>"
-              type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300"
-              onclick="updateTodo(<%= overdue[i].id %>, <%= overdue[i].completed %>)"
-              <%=overdue[i].completed ? "checked" : "" %>
-            />
-            <label
-              for="todo-checkbox-<%= overdue[i].id %>"
-              class="ml-2 text-sm text-gray-600 cursor-pointer"
-              ><%= overdue[i].title %></label
-            >
-          </div>
-          <a class="hidden trash-icon" href="#" onclick="deleteTodo(<%= overdue[i].id %>)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              class="flex items-center justify-center"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </a>
-        </li>
-        <% } %>
-      </ul>
-  
-      <div class="flex gap-2 items-center">
-        <h5>Due Today</h5>
-        <p class="bg-gray-300 flex items-center p-2 px-4 rounded-full"><%= today.length %></p>
-      </div>
-      <ul class="list-none pl-4">
-        <% for(var i=0; i<today.length; i++) {%>
-        <li class="Todo-Item flex gap-2 items-center">
-          <div
-            class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
-          >
-            <input
-              id="todo-checkbox-<%= today[i].id %>"
-              type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300"
-              onclick="updateTodo(<%= today[i].id %>, <%= today[i].completed %>)"
-              <%=today[i].completed ? "checked" : "" %>
-            />
-            <label
-              for="todo-checkbox-<%= today[i].id %>"
-              class="ml-2 text-sm text-gray-600 cursor-pointer"
-              ><%= today[i].title %></label
-            >
-          </div>
-          <a class="hidden trash-icon" href="#" onclick="deleteTodo(<%= today[i].id %>)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              class="flex items-center justify-center"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </a>
-        </li>
-        <% } %>
-      </ul>
-
-      <div class="flex gap-2 items-center">
-        <h5>Due Later</h5>
-        <p class="bg-gray-300 flex items-center p-2 px-4 rounded-full"><%= later.length %></p>
-      </div>
-      <ul class="list-none pl-4">
-        <% for(var i=0; i<later.length; i++) {%>
-        <li class="Todo-Item flex gap-2 items-center">
-          <div
-            class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
-          >
-            <input
-              id="todo-checkbox-<%= later[i].id %>"
-              type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300"
-              onclick="updateTodo(<%= later[i].id %>, <%= later[i].completed %>)"
-              <%=later[i].completed ? "checked" : "" %>
-            />
-            <label
-              for="todo-checkbox-<%= later[i].id %>"
-              class="ml-2 text-sm text-gray-600 cursor-pointer"
-              ><%= later[i].title %></label
-            >
-          </div>
-          <a class="hidden trash-icon" href="#" onclick="deleteTodo(<%= later[i].id %>)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              class="flex items-center justify-center"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </a>
-        </li>
-        <% } %>
-      </ul>
-
-      <div class="flex gap-2 items-center">
-        <h5>Completed</h5>
-        <p class="bg-gray-300 flex items-center p-2 px-4 rounded-full"><%= complete.length %></p>
-      </div>
-      <ul class="list-none pl-4">
-        <% for(var i=0; i<complete.length; i++) {%>
-        <li class="Todo-Item flex gap-2 items-center">
-          <div
-            class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
-          >
-            <input
-              id="todo-checkbox-<%= complete[i].id %>"
-              type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300"
-              onclick="updateTodo(<%= complete[i].id %>, <%= complete[i].completed %>)"
-              <%= complete[i].completed ? "checked" : "" %>
-            />
-            <label
-              for="todo-checkbox-<%= complete[i].id %>"
-              class="ml-2 text-sm text-gray-600 cursor-pointer"
-              ><%= complete[i].title %></label
-            >
-          </div>
-          <a class="hidden trash-icon" href="#" onclick="deleteTodo(<%= complete[i].id %>)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              class="flex items-center justify-center"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </a>
-        </li>
-        <% } %>
-      </ul>
-    </div>
-    </div>
-    <div class="flex justify-center"><%- include('footer.ejs') %></div>
-  </body>
+</div>
+    </body>
 </html>
