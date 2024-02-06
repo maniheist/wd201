@@ -14,10 +14,7 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "postgres",
-    "password": "Mani@111",
-    "database": "wd201mani10_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "use_env_variable":"DATABASE_URL",
+  "dialect":"postgres"
   }
 }
