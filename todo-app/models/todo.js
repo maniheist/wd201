@@ -1,5 +1,8 @@
-"use strict";
-const { Model, Op } = require("sequelize");
+/* eslint-disable no-undef */
+'use strict';
+const {
+  Model,Op
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     /**
@@ -7,15 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    // eslint-disable-next-line no-unused-vars
     static associate(models) {
       // define association here
-      Todo.belongsTo(models.User, {
+       Todo.belongsTo(models.User, {
         foreignKey: "userId",
       });
     }
-
-    static addTodo({ title, dueDate, userId }) {
+     static addTodo({ title, dueDate, userId }) {
       return this.create({
         title: title,
         dueDate: dueDate,
@@ -51,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
       return await Todo.findAll({
         where: {
           dueDate: {
+            // eslint-disable-next-line no-undef
             [Op.eq]: new Date(),
           },
           userId,
@@ -63,6 +65,7 @@ module.exports = (sequelize, DataTypes) => {
       return await Todo.findAll({
         where: {
           dueDate: {
+            // eslint-disable-next-line no-undef
             [Op.gt]: new Date(),
           },
           userId,
@@ -92,16 +95,14 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  Todo.init(
-    {
-      title: DataTypes.STRING,
-      dueDate: DataTypes.DATEONLY,
-      completed: DataTypes.BOOLEAN,
-    },
-    {
-      sequelize,
-      modelName: "Todo",
-    },
-  );
+  
+  Todo.init({
+    title: DataTypes.STRING,
+    dueDate: DataTypes.DATEONLY,
+    completed: DataTypes.BOOLEAN
+  }, {
+    sequelize,
+    modelName: 'Todo',
+  });
   return Todo;
 };
