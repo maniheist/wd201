@@ -2,25 +2,22 @@
   "development": {
     "username": "postgres",
     "password": "Mani@111",
-    "database": "wd-todo-dev",
+    "database": "wd201mani10_dev",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
-    "password": null,
-    "database": "wd-todo-test",
+    "password": "Mani@111",
+    "database": "wd201mani10_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
-   "use_env_variable":"DATABASE_URL",
-   "dialect":"postgresql",
-    "dialectOptions": {
-       "ssl": {
-         "require": true,
-         "rejectUnauthorized": false
-       }
-     }
+    "username": "postgres",
+    "password": "Mani@111",
+    "database": "wd201mani10_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   }
 }
