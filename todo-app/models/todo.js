@@ -5,13 +5,8 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+   
     static associate(models) {
-      // define association here
        Todo.belongsTo(models.User, {
         foreignKey: "userId",
       });
@@ -65,7 +60,6 @@ module.exports = (sequelize, DataTypes) => {
       return await Todo.findAll({
         where: {
           dueDate: {
-            // eslint-disable-next-line no-undef
             [Op.gt]: new Date(),
           },
           userId,
